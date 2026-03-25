@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: gword-api
+  datasource:
+    url:
+    username: root
+    password:
+
+server:
+  port: 8999
+
+wdlg:
+  # 本地单词储存目录
+  localWordDir: /Users/lingui/project/linguiProject/JavaProject/wdlg/wdlg/localData/word

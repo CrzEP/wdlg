@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: gword-cli
+  shell:
+    interactive:
+      enabled: true
+  datasource:
+    url:
+    username: root
+    password:
+
+server:
+  port: 9000
+
+gword:
+  # 本地单词储存目录
+  localWordDir: /Users/lingui/project/linguiProject/JavaProject/gword/gword/localData/word
