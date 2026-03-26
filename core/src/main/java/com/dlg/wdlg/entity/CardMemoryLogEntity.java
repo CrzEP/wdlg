@@ -39,6 +39,11 @@ public class CardMemoryLogEntity {
     private Long memoryTime;
 
     /**
+     * 下次记忆时间/应该记忆的时间
+     */
+    private Long nextMemoryTime;
+
+    /**
      * 起始记忆时间
      */
     private Long startMemoryTime;
@@ -49,7 +54,7 @@ public class CardMemoryLogEntity {
     private Long endMemoryTime;
 
     /**
-     * 本次耗时
+     * 本次耗时/复习耗时
      */
     private Long costTime;
 

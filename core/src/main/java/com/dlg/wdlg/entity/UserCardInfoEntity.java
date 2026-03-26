@@ -45,6 +45,26 @@ public class UserCardInfoEntity {
     private Long lastMemoryTime;
 
     /**
+     * 下次记忆时间，小于当前时间则认为超时
+     */
+    private Long nextMemoryTime;
+
+    /**
+     * 难度系数
+     */
+    private double difficultyIndex;
+
+    /**
+     * 稳定系数
+     */
+    private double stabilityIndex;
+
+    /**
+     * 掌握系数/间隔系数
+     */
+    private int masterIndex;
+
+    /**
      * 记忆当前卡耗时 单位毫秒
      */
     private Long cardCostMils;
@@ -58,21 +78,6 @@ public class UserCardInfoEntity {
      * 记忆次数
      */
     private int memoryCount;
-
-    /**
-     * 下次记忆时间，小于当前时间则认为超时
-     */
-    private Long nextMemoryTime;
-
-    /**
-     * 难度系数
-     */
-    private int problemIndex;
-
-    /**
-     * 掌握系数
-     */
-    private int masterIndex;
 
     private Date createTime;
 }

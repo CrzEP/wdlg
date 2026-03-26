@@ -1,11 +1,8 @@
 package com.dlg.wdlg.comm;
 
-import lombok.Getter;
-
 /**
  * 用户卡状态枚举
  */
-@Getter
 public enum UserCardStateEnum implements IterEnum<Integer> {
 
     /**
@@ -27,4 +24,8 @@ public enum UserCardStateEnum implements IterEnum<Integer> {
         this.code = code;
     }
 
+    @Override
+    public Integer getCode() {
+        return this.code;
+    }
 }
