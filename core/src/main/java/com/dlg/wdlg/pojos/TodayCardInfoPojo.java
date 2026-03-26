@@ -16,6 +16,11 @@ public class TodayCardInfoPojo {
     private int predictTime;
 
     /**
+     * 剩余学习单词数目
+     */
+    private int remainWordNum;
+
+    /**
      * 新词数
      */
     private int newWordNum;

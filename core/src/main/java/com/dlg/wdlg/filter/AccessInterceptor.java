@@ -1,17 +1,16 @@
 package com.dlg.wdlg.filter;
 
-import com.dlg.wdlg.config.WdlgValue;
-import jakarta.annotation.Resource;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.util.concurrent.TimeUnit;
+
 @Component
 public class AccessInterceptor implements HandlerInterceptor {
-
-    @Resource
-    WdlgValue wdlgValue;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

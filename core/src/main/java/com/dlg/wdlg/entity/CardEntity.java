@@ -23,12 +23,13 @@ public class CardEntity {
     private Long belongUserId;
 
     /**
-     * 内容
+     * 内容:单词Id、文本类块知识ID、树知识ID、网络知识ID
      */
     private Long contentId;
 
     /**
-     * 类型：1 单词卡
+     * 类型：1 单词卡 2文本知识 3树知识 4网络知识
+     * 前期只有单词卡
      */
     private Integer type;
 

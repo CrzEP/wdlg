@@ -17,6 +17,9 @@ public class UserEntity {
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;
 
+    /**
+     * 用户名/登陆名
+     */
     private String name;
 
     /**

@@ -27,6 +27,11 @@ public class CardRelativeEntity {
      */
     private Long relativeCardId;
 
-    private int sort;
+    private Integer sort;
+
+    /**
+     * 关联标签：空代表 单词关联
+     */
+    private String tag;
 
 }

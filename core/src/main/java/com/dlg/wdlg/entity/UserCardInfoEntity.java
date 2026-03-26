@@ -22,17 +22,17 @@ public class UserCardInfoEntity {
     /**
      * 用户ID
      */
-    private Long userId;
+    private Long belongUserId;
 
     /**
      * 1正常 2延迟记忆 3避免记忆
      */
-    private int delay;
+    private Integer delay;
 
     /**
-     * 状态
+     * 状态 1熟记 2模糊 3陌生
      */
-    private int state;
+    private Integer state;
 
     /**
      * 第一次记忆/留下日志的时间
@@ -52,17 +52,17 @@ public class UserCardInfoEntity {
     /**
      * 难度系数
      */
-    private double difficultyIndex;
+    private Double difficultyIndex;
 
     /**
      * 稳定系数
      */
-    private double stabilityIndex;
+    private Double stabilityIndex;
 
     /**
      * 掌握系数/间隔系数
      */
-    private int masterIndex;
+    private Integer masterIndex;
 
     /**
      * 记忆当前卡耗时 单位毫秒
@@ -77,7 +77,7 @@ public class UserCardInfoEntity {
     /**
      * 记忆次数
      */
-    private int memoryCount;
+    private Integer memoryCount;
 
     private Date createTime;
 }

@@ -18,24 +18,24 @@ public class CardMnemonicEntity {
     private Long id;
 
     /**
-     * 内容
-     */
-    private String content;
-
-    /**
      * 所属卡片
      */
     private Long belongCardId;
 
     /**
-     * 类型：1 句子 2记忆方式 3发音文件aiff
+     * 内容
+     */
+    private String content;
+
+    /**
+     * 类型：1 句子 2记忆方式 3发音文件aiff 4图
      */
     private Integer type;
 
     /**
      * 排序编号
      */
-    private int sort;
+    private Integer sort;
 
     /**
      * 状态：1正常 2停用

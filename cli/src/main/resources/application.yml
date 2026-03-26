@@ -1,3 +1,6 @@
+server:
+  port: 9000
+
 spring:
   application:
     name: gword-cli
@@ -5,12 +8,10 @@ spring:
     interactive:
       enabled: true
   datasource:
-    url:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://8.138.44.137:13301/gw-dev?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
-    password:
-
-server:
-  port: 9000
+    password: msQl8134!#3
 
 gword:
   # 本地单词储存目录

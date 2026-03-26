@@ -1,7 +1,8 @@
-package com.dlg.wdlg.tts;
+package com.dlg.wdlg.tts.impl;
 
 import com.dlg.wdlg.config.WdlgValue;
 import com.dlg.wdlg.exception.BuinessException;
+import com.dlg.wdlg.tts.LexicoTTS;
 import com.dlg.wdlg.util.CmdUtil;
 import jakarta.annotation.Resource;
 import lombok.Data;
