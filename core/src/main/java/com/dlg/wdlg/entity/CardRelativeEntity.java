@@ -5,10 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
- * 关联单词
+ * 卡片关联表/中间表
  */
 @Data
 @TableName("t_card_relative")

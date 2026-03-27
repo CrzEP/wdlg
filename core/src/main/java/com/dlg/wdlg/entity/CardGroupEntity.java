@@ -8,35 +8,35 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * 用户表
+ * 卡片分组表
  */
 @Data
-@TableName("t_user")
-public class UserEntity {
+@TableName("t_card_group")
+public class CardGroupEntity {
 
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户名/登陆名
+     * 组名
      */
-    private String name;
+    private String groupName;
 
     /**
-     * 1 正常 2停用
+     * 状态：1正常 2停用
      */
     private Integer available;
 
+    /**
+     * 0原始卡 1用户分组
+     */
+    private Integer type;
+
+    /**
+     * 0公共卡
+     */
+    private Long belongUserId;
+
     private Date createTime;
-
-    /**
-     * 密钥
-     */
-    private String secretKey;
-
-    /**
-     * 哈希值：用于对比密钥是否正确
-     */
-    private String secretKeyHash;
 
 }

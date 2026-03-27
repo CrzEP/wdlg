@@ -40,7 +40,7 @@ public class CardMnemonicEntity {
     /**
      * 状态：1正常 2停用
      */
-    private Integer state;
+    private Integer available;
 
     private Date createTime;
 

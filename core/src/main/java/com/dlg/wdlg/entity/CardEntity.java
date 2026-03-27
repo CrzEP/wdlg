@@ -22,8 +22,10 @@ public class CardEntity {
      */
     private Long belongUserId;
 
+    private Long belongGroupId;
+
     /**
-     * 内容:单词Id、文本类块知识ID、树知识ID、网络知识ID
+     * 内容ID:单词Id、文本类块知识ID、树知识ID、网络知识ID
      */
     private Long contentId;
 
@@ -36,7 +38,7 @@ public class CardEntity {
     /**
      * 状态：1正常 2停用
      */
-    private Integer state;
+    private Integer available;
 
     private Date createTime;
 

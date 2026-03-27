@@ -25,6 +25,11 @@ public class UserCardInfoEntity {
     private Long belongUserId;
 
     /**
+     * 所属分组
+     */
+    private Long belongGroupId;
+
+    /**
      * 1正常 2延迟记忆 3避免记忆
      */
     private Integer delay;

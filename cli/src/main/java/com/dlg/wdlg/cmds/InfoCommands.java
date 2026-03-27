@@ -12,6 +12,4 @@ public class InfoCommands {
         return "version: " + GConst.VERSION;
     }
 
-
-
 }
