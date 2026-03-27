@@ -1,7 +1,7 @@
 package com.dlg.wdlg.tts.impl;
 
 import com.dlg.wdlg.config.WdlgValue;
-import com.dlg.wdlg.exception.BuinessException;
+import com.dlg.wdlg.exception.BusinessException;
 import com.dlg.wdlg.tts.LexicoTTS;
 import com.dlg.wdlg.util.CmdUtil;
 import jakarta.annotation.Resource;
@@ -48,7 +48,7 @@ public class MacTTS implements LexicoTTS {
             CmdUtil.exec(cmd);
         } catch (IOException e) {
             log.error("MacTTS macPlay error: ", e);
-            throw new BuinessException(e.getMessage());
+            throw new BusinessException(e.getMessage());
         }
     }
 
@@ -73,7 +73,7 @@ public class MacTTS implements LexicoTTS {
             CmdUtil.exec(cmd);
         } catch (IOException e) {
             log.error("MacTTS saveVoiceFile error: ", e);
-            throw new BuinessException(e.getMessage());
+            throw new BusinessException(e.getMessage());
         }
     }
 

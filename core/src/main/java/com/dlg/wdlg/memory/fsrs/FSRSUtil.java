@@ -3,7 +3,7 @@ package com.dlg.wdlg.memory.fsrs;
 import com.dlg.wdlg.comm.UserCardStateEnum;
 import com.dlg.wdlg.entity.CardMemoryLogEntity;
 import com.dlg.wdlg.entity.UserCardInfoEntity;
-import com.dlg.wdlg.exception.BuinessException;
+import com.dlg.wdlg.exception.BusinessException;
 import io.github.openspacedrepetition.Card;
 import io.github.openspacedrepetition.ReviewLog;
 import io.github.openspacedrepetition.State;
@@ -33,7 +33,7 @@ public class FSRSUtil {
                 // 忘记
                 return State.RELEARNING;
             default:
-                throw new BuinessException("error state code");
+                throw new BusinessException("error state code");
         }
     }
 
@@ -85,7 +85,7 @@ public class FSRSUtil {
             case 4:
                 return UserCardStateEnum.FAMILIAR;
             default:
-                throw new BuinessException("error rating code");
+                throw new BusinessException("error rating code");
         }
     }
 

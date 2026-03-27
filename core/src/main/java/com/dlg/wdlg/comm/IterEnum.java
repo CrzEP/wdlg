@@ -1,6 +1,6 @@
 package com.dlg.wdlg.comm;
 
-import com.dlg.wdlg.exception.BuinessException;
+import com.dlg.wdlg.exception.BusinessException;
 
 /**
  * 迭代枚举接口
@@ -20,7 +20,7 @@ public interface IterEnum<T> {
                 return e;
             }
         }
-        throw new BuinessException(
+        throw new BusinessException(
                 "No enum constant " + enumClass.getSimpleName() + " with code " + code
         );
     }
