@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
+import java.util.Map;
+
 public class JsonUtils {
 
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -52,4 +54,15 @@ public class JsonUtils {
             throw new RuntimeException("JSON反序列化失败", e);
         }
     }
+
+    /**
+     * bean 转 map
+     * @param bean bean
+     * @return map
+     */
+    public static Map beanToMap(Object bean) {
+        return mapper.convertValue(bean, Map.class);
+    }
+
+
 }

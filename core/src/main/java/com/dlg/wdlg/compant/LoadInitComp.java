@@ -31,6 +31,6 @@ public class LoadInitComp implements Runnable{
     @Override
     public void run() {
 //        loadFromBaiCi.startReq();
-        loadFromCsv.startReq();
+//        loadFromCsv.startReq();
     }
 }
