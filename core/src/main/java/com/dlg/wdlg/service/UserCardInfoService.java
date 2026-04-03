@@ -9,15 +9,22 @@ public interface UserCardInfoService extends IService<UserCardInfoEntity> {
      * 添加用户卡组单词信息
      *
      * @param userId  userId
-     * @param groupId groupId
+     * @param sourGroupId sourGroupId
      */
-    void addUserCardGroup(Long userId, Long groupId);
+    void addUserCardGroup(Long userId, Long sourGroupId);
 
     /**
-     * 根据userId 和 cardId 查找
+     * 获取非空
+     * @param cardId cardId
+     * @return entity
+     */
+    UserCardInfoEntity getNotNullByCardId(Long cardId);
+
+    /**
+     * 添加一个用户学习卡
      * @param userId userId
      * @param cardId cardId
      * @return entity
      */
-    UserCardInfoEntity findByUserIdAndCardId(Long userId, Long cardId);
+    UserCardInfoEntity addUserCardInfo(Long userId, Long cardId);
 }

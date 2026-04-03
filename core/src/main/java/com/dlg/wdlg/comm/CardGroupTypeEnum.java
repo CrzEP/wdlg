@@ -10,7 +10,8 @@ public enum CardGroupTypeEnum implements IterEnum<Integer> {
     /**
      * 用户组卡
      */
-    USER(GConst.USER_GROUP);
+    USER(GConst.USER_GROUP),
+    USER_LEARNING(GConst.USER_GROUP);
 
     private final int code;
 

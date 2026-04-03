@@ -3,6 +3,8 @@ package com.dlg.wdlg.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dlg.wdlg.entity.WordEntity;
 
+import java.util.Optional;
+
 public interface WordService extends IService<WordEntity> {
 
     /**
@@ -18,5 +20,14 @@ public interface WordService extends IService<WordEntity> {
      * @param word 单词
      * @return WordEntity
      */
-    WordEntity findByWords(String word);
+    Optional<WordEntity> findByWordOne(String word);
+
+    /**
+     * 根据单词找记录,非空
+     *
+     * @param word 单词
+     * @return WordEntity
+     */
+    WordEntity getByWordOneNonNull(String word);
+
 }

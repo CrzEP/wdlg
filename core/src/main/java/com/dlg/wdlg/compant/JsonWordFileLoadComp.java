@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Data
@@ -43,8 +44,6 @@ public class JsonWordFileLoadComp {
     private WordSentenceMapper wordSentenceMapper;
     @Resource
     private CardRelativeService relativeService;
-    @Resource
-    private WordQueryService wordQueryService;
 
     @Transactional(rollbackFor = Exception.class)
     public void loadJsonWordFile(String jsonFilePath) {
@@ -82,19 +81,24 @@ public class JsonWordFileLoadComp {
      * @param wordInfo wordInfo
      */
     private void relWords(WordInfo wordInfo) {
-        WordEntity sourWordEntity = wordService.findByWords(wordInfo.getWord());
-        if (sourWordEntity == null) {
+        Optional<WordEntity> sourWordOptional = wordService.findByWordOne(wordInfo.getWord());
+        if (sourWordOptional.isEmpty()) {
             return;
         }
+        WordEntity sourWordEntity = sourWordOptional.get();
         List<String> wordList = wordInfo.getRelWordList();
         if (CollectionUtils.isEmpty(wordList)) {
             return;
         }
         for (String word : wordList) {
-            WordEntity relWord = wordService.findByWords(word);
-            if (relWord != null) {
-                relativeService.saveWordRel(sourWordEntity.getId(), relWord.getId());
+            // todo
+            Optional<WordEntity> entityOptional = wordService.findByWordOne(word);
+            // todo
+            if (entityOptional.isEmpty()) {
+                continue;
             }
+            WordEntity entity = entityOptional.get();
+            relativeService.saveWordRel(sourWordEntity.getId(), entity.getId());
         }
     }
 
@@ -109,7 +113,8 @@ public class JsonWordFileLoadComp {
         if (StringUtils.isEmpty(word)) {
             throw new BusinessException("word is empty");
         }
-        CardEntity cardEntity = wordQueryService.getCardByWordAndGroupId(word, groupId);
+        // todo
+        CardEntity cardEntity = null;
         if (null != cardEntity) {
             // 已存在则不添加
             return false;

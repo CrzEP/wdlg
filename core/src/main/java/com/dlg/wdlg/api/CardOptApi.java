@@ -31,5 +31,12 @@ public interface CardOptApi {
      */
     void addLoginUserPubCardGroup(Long groupId);
 
+    /**
+     * 添加当前用户一个单词卡
+     * 必须是公共卡组有的卡
+     *
+     * @param word 单词
+     */
+    void addLoginUserWordCard(String word);
 
 }

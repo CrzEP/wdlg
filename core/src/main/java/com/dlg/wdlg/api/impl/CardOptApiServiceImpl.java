@@ -3,24 +3,22 @@ package com.dlg.wdlg.api.impl;
 import com.dlg.wdlg.api.CardOptApi;
 import com.dlg.wdlg.comm.UserCardStateEnum;
 import com.dlg.wdlg.compant.CacheCollection;
-import com.dlg.wdlg.entity.CardGroupEntity;
+import com.dlg.wdlg.entity.CardEntity;
 import com.dlg.wdlg.entity.UserCardInfoEntity;
 import com.dlg.wdlg.exception.BusinessException;
 import com.dlg.wdlg.memory.MemoryAdapter;
 import com.dlg.wdlg.pojos.CardInfoPojo;
 import com.dlg.wdlg.pojos.CardUserAndLogInfo;
-import com.dlg.wdlg.service.CardGroupService;
-import com.dlg.wdlg.service.CardMemoryLogService;
-import com.dlg.wdlg.service.UserCardInfoService;
+import com.dlg.wdlg.service.*;
 import com.dlg.wdlg.util.UserUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -36,6 +34,10 @@ public class CardOptApiServiceImpl implements CardOptApi {
     MemoryAdapter memoryAdapter;
 
     private final Cache<Long, LinkedHashMap<String, UserCardInfoEntity>> userCardCache = CacheCollection.USER_CARD_CACHE;
+    @Autowired
+    private WordService wordService;
+    @Autowired
+    private CardService cardService;
 
     @Override
     public CardInfoPojo getNextCard() {
@@ -47,13 +49,12 @@ public class CardOptApiServiceImpl implements CardOptApi {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void optCard(Long cardId, UserCardStateEnum statge, Long optTime) {
-        Long userId = UserUtil.getUserIdNotNull();
-        UserCardInfoEntity userCardInfo = userCardInfoService.findByUserIdAndCardId(userId, cardId);
+        UserCardInfoEntity cardInfoEntity = userCardInfoService.getNotNullByCardId(cardId);
         // 复习
         if (optTime == null) {
             optTime = System.currentTimeMillis();
         }
-        CardUserAndLogInfo userAndLogInfo = memoryAdapter.review(userCardInfo, statge, optTime);
+        CardUserAndLogInfo userAndLogInfo = memoryAdapter.review(cardInfoEntity, statge, optTime);
         updateCardUserAndLogInfo(userAndLogInfo);
     }
 
@@ -68,18 +69,21 @@ public class CardOptApiServiceImpl implements CardOptApi {
     }
 
     @Override
-    public void addLoginUserPubCardGroup(Long groupId) {
-        // 检查组
-        Optional<CardGroupEntity> groupEntity = cardGroupService.getOptById(groupId);
-        if (groupEntity.isEmpty()) {
-            throw new BusinessException("cardGroup not found");
+    public void addLoginUserPubCardGroup(Long pubGroupId) {
+        Long userId = UserUtil.getUserIdNotNull();
+        // 添加用户卡组单词信息
+        userCardInfoService.addUserCardGroup(userId, pubGroupId);
+    }
+
+    @Override
+    public void addLoginUserWordCard(String word) {
+        CardEntity cardEntity = cardService.findOneWordCard(word);
+        if (cardEntity == null) {
+            throw new BusinessException("not word : " + word + "public card found");
         }
         Long userId = UserUtil.getUserIdNotNull();
-        // 添加用户卡组
-        cardGroupService.saveUserCardGroupFromPubCardGroup(userId, groupId);
-        // 添加用户卡组单词信息
-        userCardInfoService.addUserCardGroup(userId, groupId);
-        log.info("已添加用户公共卡组：{}", groupEntity.get().getGroupName());
+        userCardInfoService.addUserCardInfo(userId, cardEntity.getId());
+        log.info("添加单词卡 {} 成功", word);
     }
 
 }

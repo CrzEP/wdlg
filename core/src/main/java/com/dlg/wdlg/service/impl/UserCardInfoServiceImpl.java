@@ -1,8 +1,8 @@
 package com.dlg.wdlg.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dlg.wdlg.comm.UserCardDelayEnum;
+import com.dlg.wdlg.entity.CardGroupEntity;
 import com.dlg.wdlg.entity.UserCardInfoEntity;
 import com.dlg.wdlg.exception.BusinessException;
 import com.dlg.wdlg.mapper.UserCardInfoMapper;
@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,46 +29,50 @@ public class UserCardInfoServiceImpl extends ServiceImpl<UserCardInfoMapper, Use
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void addUserCardGroup(Long userId, Long groupId) {
-        List<Long> cardIs = cardService.listIdsByGroupId(groupId);
-        List<UserCardInfoEntity> userCardList = new ArrayList<>(cardIs.size());
+    public void addUserCardGroup(Long userId, Long sourGroupId) {
+        // 检查属于此用户的卡组
+        cardGroupService.checkPubGroup(sourGroupId);
+        CardGroupEntity pubGroup = cardGroupService.getNotNullGroup(sourGroupId);
+        List<Long> cardIs = cardService.listIdsByGroupId(sourGroupId);
         for (Long cardId : cardIs) {
-            UserCardInfoEntity entity = addUserCardInfo(userId, cardId, groupId);
-            userCardList.add(entity);
+            addUserCardInfo(userId, cardId);
         }
-        saveBatch(userCardList);
+        log.info("添加公共卡组： {} 完毕，共 {} 个",
+                pubGroup.getGroupName(), cardIs.size());
     }
 
     @Override
-    public UserCardInfoEntity findByUserIdAndCardId(Long userId, Long cardId) {
-        LambdaQueryWrapper<UserCardInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UserCardInfoEntity::getBelongUserId,userId);
-        queryWrapper.eq(UserCardInfoEntity::getCardId,cardId);
-        Optional<UserCardInfoEntity> oneOpt = this.getOneOpt(queryWrapper);
-        if(oneOpt.isPresent()){
-            return oneOpt.get();
+    public UserCardInfoEntity getNotNullByCardId(Long cardId) {
+        Optional<UserCardInfoEntity> entity = getOptById(cardId);
+        if (entity.isPresent()) {
+            return entity.get();
         }
-        throw new BusinessException("userCard not found");
+        throw new BusinessException("card not found");
     }
 
     /**
      * 添加用户卡信息
      *
-     * @param userId  userId
-     * @param cardId  cardId
-     * @param groupId groupId
+     * @param userId userId
+     * @param cardId cardId
      */
-    private UserCardInfoEntity addUserCardInfo(Long userId, Long cardId, Long groupId) {
+    @Override
+    public UserCardInfoEntity addUserCardInfo(Long userId, Long cardId) {
+        CardGroupEntity userLearningCardGroup = cardGroupService.getUserLearningCardGroup(userId);
+        Long userLearningCardGroupId = userLearningCardGroup.getId();
+        // 检查卡片
+        getNotNullByCardId(cardId);
         // 创建记忆卡
         UserCardInfoEntity entity = FSRSUtil.newCard();
         // 设定初始参数
         entity.setCardId(cardId);
         entity.setBelongUserId(userId);
-        entity.setBelongGroupId(groupId);
+        entity.setBelongGroupId(userLearningCardGroupId);
         entity.setDelay(UserCardDelayEnum.JOIN.getCode());
         entity.setCardCostMils(0L);
         entity.setCardCostDay(0L);
         entity.setMemoryCount(0);
+        save(entity);
         return entity;
     }
 

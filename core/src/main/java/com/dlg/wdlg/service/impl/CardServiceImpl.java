@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -72,6 +73,25 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, CardEntity> impleme
                 .stream()
                 .map(CardEntity::getId)
                 .toList();
+    }
+
+    @Override
+    public CardEntity findWordCardByContentIdAndType(Long id, CardTypeEnum type) {
+        LambdaQueryWrapper<CardEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CardEntity::getContentId, id);
+        queryWrapper.eq(CardEntity::getType, type.getCode());
+        return getOne(queryWrapper);
+
+    }
+
+    @Override
+    public CardEntity findOneWordCard(String word) {
+        Optional<WordEntity> optionalWord = wordService.findByWordOne(word);
+        if (optionalWord.isEmpty()) {
+            throw new BusinessException("not word : " + word + "public card found");
+        }
+        WordEntity wordEntity = optionalWord.get();
+        return findWordCardByContentIdAndType(wordEntity.getId(), CardTypeEnum.WORD);
     }
 
     /**

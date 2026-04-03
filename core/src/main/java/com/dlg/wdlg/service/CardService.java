@@ -1,6 +1,7 @@
 package com.dlg.wdlg.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dlg.wdlg.comm.CardTypeEnum;
 import com.dlg.wdlg.entity.CardEntity;
 import com.dlg.wdlg.entity.WordEntity;
 
@@ -37,4 +38,19 @@ public interface CardService extends IService<CardEntity> {
      */
     List<Long> listIdsByGroupId(Long groupId);
 
+    /**
+     * 根据内容ID和类型查找
+     *
+     * @param id id
+     * @param type type
+     * @return card
+     */
+    CardEntity findWordCardByContentIdAndType(Long id, CardTypeEnum type);
+
+    /**
+     * 查找一个单词卡
+     * @param word 单词
+     * @return 卡
+     */
+    CardEntity findOneWordCard(String word);
 }
