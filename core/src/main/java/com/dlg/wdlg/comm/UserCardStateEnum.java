@@ -28,4 +28,5 @@ public enum UserCardStateEnum implements IterEnum<Integer> {
     public Integer getCode() {
         return this.code;
     }
+
 }

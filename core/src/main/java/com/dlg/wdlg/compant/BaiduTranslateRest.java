@@ -1,66 +1,59 @@
 package com.dlg.wdlg.compant;
 
 import com.dlg.wdlg.exception.BusinessException;
+import com.dlg.wdlg.util.AlgoUtil;
 import com.dlg.wdlg.util.HttpUtil;
 import com.dlg.wdlg.util.JsonUtils;
-import jakarta.annotation.Resource;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
-@Component
 @Slf4j
 public class BaiduTranslateRest {
 
-    @Resource
-    RestTemplate restTemplate;
+    /**
+     * 百度翻译地址
+     */
+    private final static String URL = "https://fanyi-api.baidu.com/api/trans/vip/translate";
 
-    private final static String url = "https://fanyi-api.baidu.com/api/trans/vip/translate";
+    /**
+     * appid 和 密钥
+     */
+    private static String APP_ID;
+    private static String SECRET_KEY;
 
-    private final static String appId = "";
-    private final static String secretKey = "";
+    /**
+     * 单例
+     */
+    @Getter
+    private static volatile BaiduTranslateRest INSTANCE;
 
-    private final static Random random = new Random(System.currentTimeMillis());
-
-    private static String md5(String question, String salt) {
-        byte[] data = merge(appId, question);
-        data = merge(data, salt.getBytes(StandardCharsets.UTF_8));
-        data = merge(data, secretKey.getBytes(StandardCharsets.UTF_8));
-        return md5(data);
+    private BaiduTranslateRest(String appID, String secretKey) {
+        APP_ID = appID;
+        SECRET_KEY = secretKey;
     }
 
-    private static byte[] merge(byte[] arrBytes, byte[] nextBytes) {
-        byte[] result = new byte[arrBytes.length + nextBytes.length];
-        System.arraycopy(arrBytes, 0, result, 0, arrBytes.length);
-        System.arraycopy(nextBytes, 0, result, arrBytes.length, nextBytes.length);
-        return result;
-    }
-
-    private static byte[] merge(String arr, String next) {
-        byte[] arrBytes = arr.getBytes(StandardCharsets.UTF_8);
-        byte[] nextBytes = next.getBytes(StandardCharsets.UTF_8);
-        return merge(arrBytes, nextBytes);
-    }
-
-    private static String md5(byte[] input) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] digest = md.digest(input);
-            StringBuilder sb = new StringBuilder();
-            for (byte b : digest) {
-                sb.append(java.lang.String.format("%02x", b));
+    /**
+     * 获得对象
+     *
+     * @param appID     appID
+     * @param secretKey secretKey
+     * @return 翻译对象
+     */
+    public static BaiduTranslateRest INSTANCE(String appID, String secretKey) {
+        if (INSTANCE == null) {
+            synchronized (BaiduTranslateRest.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new BaiduTranslateRest(appID, secretKey);
+                }
             }
-            return sb.toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
+        return INSTANCE;
     }
 
     /**
@@ -69,10 +62,13 @@ public class BaiduTranslateRest {
      * @param word 单词/句子
      * @return 响应
      */
-    public static String translate(String word) {
-        ReqParam reqParam = new ReqParam(word);
+    public String translate(String word) {
+        checkParams();
+        String salt = AlgoUtil.getRandom(32);
+        String sign = md5(word, salt);
+        ReqParam reqParam = new ReqParam(word, salt, sign);
         Map<String, String> map = JsonUtils.beanToMap(reqParam);
-        String reqUrl = HttpUtil.buildGetUrl(url, map);
+        String reqUrl = HttpUtil.buildGetUrl(URL, map);
         try {
             String result = HttpUtil.get(reqUrl);
             log.info(result);
@@ -83,7 +79,61 @@ public class BaiduTranslateRest {
         }
     }
 
+    /**
+     * 检查参数
+     */
+    private void checkParams() {
+        if (StringUtils.isBlank(APP_ID) || StringUtils.isBlank(SECRET_KEY)) {
+            throw new BusinessException("baici translate 组件未初始化...");
+        }
+    }
 
+    /**
+     * md5
+     *
+     * @param question 带翻译原文
+     * @param salt     加盐值
+     * @return md5值
+     */
+    private String md5(String question, String salt) {
+        byte[] data = merge(APP_ID, question);
+        data = merge(data, salt.getBytes(StandardCharsets.UTF_8));
+        data = merge(data, SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+        return AlgoUtil.md5(data);
+    }
+
+    /**
+     * 组合
+     *
+     * @param arrBytes  arrBytes
+     * @param nextBytes nextBytes
+     * @return 合并数组
+     */
+    private static byte[] merge(byte[] arrBytes, byte[] nextBytes) {
+        byte[] result = new byte[arrBytes.length + nextBytes.length];
+        System.arraycopy(arrBytes, 0, result, 0, arrBytes.length);
+        System.arraycopy(nextBytes, 0, result, arrBytes.length, nextBytes.length);
+        return result;
+    }
+
+    /**
+     * 组合
+     *
+     * @param arr  arr
+     * @param next next
+     * @return 合并数组
+     */
+    private static byte[] merge(String arr, String next) {
+        byte[] arrBytes = arr.getBytes(StandardCharsets.UTF_8);
+        byte[] nextBytes = next.getBytes(StandardCharsets.UTF_8);
+        return merge(arrBytes, nextBytes);
+    }
+
+
+
+    /**
+     * 请求参数，目前只有中译英需求
+     */
     @Data
     static class ReqParam {
         String q;
@@ -93,16 +143,16 @@ public class BaiduTranslateRest {
         String salt;
         String sign;
 
-        public ReqParam(String q) {
+        public ReqParam(String q, String appid, String sign) {
             this.q = q;
             this.from = "en";
             this.to = "zh";
-            this.appid = appId;
-            byte[] saltBytes = new byte[32];
-            random.nextBytes(saltBytes);
-            this.salt = new String(saltBytes, StandardCharsets.UTF_8);
-            this.sign = md5(q, salt);
+            this.appid = appid;
+            this.salt = getSalt();
+            this.sign = sign;
         }
+
+
     }
 
     @Data

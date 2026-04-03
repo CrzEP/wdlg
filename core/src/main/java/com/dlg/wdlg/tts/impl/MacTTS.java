@@ -1,6 +1,6 @@
 package com.dlg.wdlg.tts.impl;
 
-import com.dlg.wdlg.config.WdlgValue;
+import com.dlg.wdlg.config.configValue.WdlgValue;
 import com.dlg.wdlg.exception.BusinessException;
 import com.dlg.wdlg.tts.LexicoTTS;
 import com.dlg.wdlg.util.CmdUtil;
@@ -78,7 +78,7 @@ public class MacTTS implements LexicoTTS {
     }
 
     public File findOrSaveVoiceFile(String word) {
-        String localWordDir = wordValue.getLocalWordDir();
+        String localWordDir = wordValue.getLocalWordSaveDir();
         String filePath = localWordDir + word;
         File file = new File(filePath);
         if (!file.exists()) {

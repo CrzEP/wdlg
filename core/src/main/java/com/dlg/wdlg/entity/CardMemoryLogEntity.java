@@ -16,7 +16,7 @@ import java.util.Date;
 public class CardMemoryLogEntity {
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     /**
      * 所属卡片
@@ -29,19 +29,9 @@ public class CardMemoryLogEntity {
     private String tag;
 
     /**
-     * 状态：1熟悉 2模糊 3陌生
+     * 状态：1熟悉 2模糊 3困难 4陌生
      */
-    private Integer state;
-
-    /**
-     * 记忆时间戳/操作时的记忆时间
-     */
-    private Long memoryTime;
-
-    /**
-     * 下次记忆时间/应该记忆的时间
-     */
-    private Long nextMemoryTime;
+    private Integer rating;
 
     /**
      * 起始记忆时间

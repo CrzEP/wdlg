@@ -1,6 +1,7 @@
 package com.dlg.wdlg.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dlg.wdlg.entity.StrRecordEntity;
 import com.dlg.wdlg.mapper.StrRecordMapper;
@@ -21,5 +22,12 @@ public class StrRecordServiceImpl extends ServiceImpl<StrRecordMapper, StrRecord
             save(entity);
             log.info("保存 StrRecordEntity :{} ", entity);
         }
+    }
+
+    @Override
+    public PageDTO<StrRecordEntity> pageByStrTag(PageDTO<StrRecordEntity> pageDTO, String strTag){
+        LambdaQueryWrapper<StrRecordEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(StrRecordEntity::getStrTag, strTag);
+        return this.page(pageDTO, queryWrapper);
     }
 }

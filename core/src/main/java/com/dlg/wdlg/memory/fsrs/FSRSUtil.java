@@ -1,10 +1,10 @@
 package com.dlg.wdlg.memory.fsrs;
 
-import com.dlg.wdlg.comm.UserCardStateEnum;
 import com.dlg.wdlg.entity.CardMemoryLogEntity;
 import com.dlg.wdlg.entity.UserCardInfoEntity;
 import com.dlg.wdlg.exception.BusinessException;
 import io.github.openspacedrepetition.Card;
+import io.github.openspacedrepetition.Rating;
 import io.github.openspacedrepetition.ReviewLog;
 import io.github.openspacedrepetition.State;
 
@@ -16,7 +16,100 @@ import java.time.Instant;
 public class FSRSUtil {
 
     /**
-     * 状态
+     * 转换卡对象
+     *
+     * @param entity 用户卡
+     * @return card
+     */
+    public static Card covertToCard(UserCardInfoEntity entity) {
+        int id = Math.toIntExact(entity.getId());
+        // id 不可变标记卡片唯一
+        return Card.builder().cardId(id)
+                // 掌握程度
+                .step(entity.getMasterIndex())
+                // 状态
+                .state(toState(entity.getState()))
+                // 稳定性：能记多久
+                .stability(entity.getStabilityIndex())
+                // 难度：卡片本身难度
+                .difficulty(entity.getDifficultyIndex())
+                // 应该被复习的时间点
+                .due(Instant.ofEpochMilli(entity.getNextMemoryTime()))
+                // 最后一次复习
+                .lastReview(Instant.ofEpochMilli(entity.getLastMemoryTime()))
+                .build();
+    }
+
+    /**
+     * 转 卡 记忆日志
+     *
+     * @param reviewedLog 复习日志
+     * @return 记忆日志
+     */
+    public static CardMemoryLogEntity covertToMemoryLog(ReviewLog reviewedLog) {
+        CardMemoryLogEntity entity = new CardMemoryLogEntity();
+        entity.setBelongCardId((long) reviewedLog.cardId());
+        entity.setRating(rating(reviewedLog.rating()));
+        long start = reviewedLog.reviewDatetime().getEpochSecond();
+        entity.setStartMemoryTime(start);
+        long cost = reviewedLog.reviewDuration().longValue();
+        long end = start + cost;
+        entity.setEndMemoryTime(end);
+        entity.setCostTime(cost);
+        entity.setTag("reviewedLog");
+        return entity;
+    }
+
+    /**
+     * 转 卡 记忆日志
+     *
+     * @param entity 复习日志
+     * @return 记忆日志
+     */
+    public static ReviewLog covertToReviewLog(CardMemoryLogEntity entity) {
+        return new ReviewLog(
+                entity.getId(), codeToRating(entity.getRating()),
+                Instant.ofEpochMilli(entity.getStartMemoryTime()),
+                Math.toIntExact(entity.getCostTime())
+        );
+    }
+
+
+    /**
+     * 更新
+     *
+     * @param card   card
+     * @param entity entity
+     */
+    public static void updateFromCard(Card card, UserCardInfoEntity entity) {
+        // 掌握程度
+        entity.setMasterIndex(card.getStep());
+        // 稳定性
+        entity.setStabilityIndex(card.getStability());
+        // 难度
+        entity.setDifficultyIndex(card.getDifficulty());
+        // 下次记忆时间
+        entity.setNextMemoryTime(card.getDue().getEpochSecond());
+        // 上次记忆时间
+        entity.setLastMemoryTime(card.getLastReview().getEpochSecond());
+        // 卡片状态
+        entity.setState(toRecordState(card.getState()));
+    }
+
+    /**
+     * 新卡
+     *
+     * @return 新卡参数
+     */
+    public static UserCardInfoEntity newCard() {
+        UserCardInfoEntity entity = new UserCardInfoEntity();
+        Card card = Card.builder().build();
+        updateFromCard(card, entity);
+        return entity;
+    }
+
+    /**
+     * 状态: 卡状态
      *
      * @param state 状态
      * @return state
@@ -38,68 +131,67 @@ public class FSRSUtil {
     }
 
     /**
-     * 转换卡对象
+     * 卡状态转数据库状态
      *
-     * @param entity 用户卡
-     * @return card
+     * @param state 状态
+     * @return code
      */
-    public static Card covertToCard(UserCardInfoEntity entity) {
-        int id = Math.toIntExact(entity.getId());
-        return Card.builder().cardId(id)
-                .step(entity.getMasterIndex())
-                .state(FSRSUtil.toState(entity.getState()))
-                .stability(entity.getStabilityIndex())
-                .difficulty(entity.getDifficultyIndex())
-                .due(Instant.ofEpochMilli(entity.getNextMemoryTime()))
-                .lastReview(Instant.ofEpochMilli(entity.getLastMemoryTime()))
-                .build();
+    public static int toRecordState(State state) {
+        switch (state) {
+            case LEARNING:
+                // 熟悉
+                return 1;
+            case REVIEW:
+                // 陌生
+                return 2;
+            case RELEARNING:
+                // 忘记
+                return 3;
+            default:
+                throw new BusinessException("error state");
+        }
     }
 
     /**
-     * 转 卡 记忆日志
-     * @param reviewedLog 复习日志
-     * @return 记忆日志
-     */
-    public static CardMemoryLogEntity covertToMemoryLog(ReviewLog reviewedLog) {
-        CardMemoryLogEntity entity = new CardMemoryLogEntity();
-        entity.setBelongCardId((long) reviewedLog.cardId());
-        UserCardStateEnum state = ratingToState(reviewedLog.rating().getValue());
-        entity.setState(state.getCode());
-        entity.setNextMemoryTime(reviewedLog.reviewDatetime().getEpochSecond());
-        return entity;
-    }
-
-    /**
-     * 评分转状态
+     * 日志/操作评分code
      *
      * @param rating 评分
-     * @return 状态
+     * @return code
      */
-    public static UserCardStateEnum ratingToState(int rating) {
+    public static int rating(Rating rating) {
         switch (rating) {
-            case 1:
-            case 2:
-                return UserCardStateEnum.UNFAMILIAR;
-            case 3:
-                return UserCardStateEnum.BLUR;
-            case 4:
-                return UserCardStateEnum.FAMILIAR;
+            case EASY:
+                return 1;
+            case HARD:
+                return 2;
+            case GOOD:
+                return 3;
+            case AGAIN:
+                return 4;
             default:
                 throw new BusinessException("error rating code");
         }
     }
 
     /**
-     * 更新
-     * @param card card
-     * @param entity entity
+     * 日志评分转
+     *
+     * @param code code
+     * @return 评分
      */
-    public static void updateFromCard(Card card, UserCardInfoEntity entity) {
-        entity.setMasterIndex(card.getStep());
-        entity.setStabilityIndex(card.getStability());
-        entity.setDifficultyIndex(card.getDifficulty());
-        entity.setNextMemoryTime(card.getDue().getEpochSecond());
-        entity.setLastMemoryTime(card.getLastReview().getEpochSecond());
-        entity.setState(card.getState().getValue());
+    public static Rating codeToRating(int code) {
+        switch (code) {
+            case 1:
+                return Rating.EASY;
+            case 2:
+                return Rating.GOOD;
+            case 3:
+                return Rating.HARD;
+            case 4:
+                return Rating.AGAIN;
+            default:
+                throw new BusinessException("error rating code");
+        }
     }
+
 }

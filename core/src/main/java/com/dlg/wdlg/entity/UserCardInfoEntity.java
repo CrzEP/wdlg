@@ -30,7 +30,7 @@ public class UserCardInfoEntity {
     private Long belongGroupId;
 
     /**
-     * 1正常 2延迟记忆 3避免记忆
+     * 1加入但未开始记忆 2正常 3延迟记忆 4避免记忆
      */
     private Integer delay;
 

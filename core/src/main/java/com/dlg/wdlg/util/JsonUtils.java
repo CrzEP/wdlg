@@ -1,5 +1,6 @@
 package com.dlg.wdlg.util;
 
+import com.dlg.wdlg.exception.BusinessException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -64,5 +65,16 @@ public class JsonUtils {
         return mapper.convertValue(bean, Map.class);
     }
 
-
+    /**
+     * json 转 map
+     * @param json
+     * @return map
+     */
+    public static Map readAsMap(String json) {
+        try {
+            return mapper.readValue(json,Map.class);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException("jsonProcess error :" + e.getMessage());
+        }
+    }
 }

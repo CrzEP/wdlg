@@ -1,7 +1,7 @@
 package com.dlg.wdlg.api;
 
 /**
- * 其他API 调用
+ * 网络其他API 调用
  */
 public interface NetApiRestApi {
 
