@@ -5,7 +5,6 @@ import com.dlg.wdlg.comm.GConst;
 import com.dlg.wdlg.config.configValue.WdlgValue;
 import com.dlg.wdlg.entity.UserEntity;
 import com.dlg.wdlg.exception.BusinessException;
-import com.dlg.wdlg.pojos.TodayCardInfoPojo;
 import com.dlg.wdlg.service.UserService;
 import com.dlg.wdlg.util.AlgoUtil;
 import com.dlg.wdlg.util.ServletRequestUtil;
@@ -26,11 +25,6 @@ public class AccountApiServiceImpl implements AccountApi {
     WdlgValue wdlgValue;
     @Resource
     UserService userService;
-
-    @Override
-    public TodayCardInfoPojo getTodayCardInfo() {
-        return null;
-    }
 
     @Override
     public void login(String username, String passwdHash) {

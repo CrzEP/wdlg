@@ -7,6 +7,7 @@ public interface LoadWordService {
 
     /**
      * 从文件中加载：仅支持支持的json格式
+     *
      * @param jsonFilePath jsonFilePath
      */
     void loadFromJsonWordFile(String jsonFilePath);

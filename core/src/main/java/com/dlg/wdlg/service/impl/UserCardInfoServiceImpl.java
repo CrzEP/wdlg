@@ -76,4 +76,24 @@ public class UserCardInfoServiceImpl extends ServiceImpl<UserCardInfoMapper, Use
         return entity;
     }
 
+    @Override
+    public UserCardInfoEntity getNotNullById(Long id) {
+        Optional<UserCardInfoEntity> entity = getOptById(id);
+        if (entity.isPresent()) {
+            return entity.get();
+        }
+        throw new BusinessException("userCardInfo not found");
+    }
+
+    @Override
+    public List<Long> ListDelayUserCard(Integer type) {
+        return this.lambdaQuery()
+                .eq(UserCardInfoEntity::getDelay, type)
+                .select(UserCardInfoEntity::getId)
+                .list()
+                .stream()
+                .map(UserCardInfoEntity::getId)
+                .toList();
+    }
+
 }

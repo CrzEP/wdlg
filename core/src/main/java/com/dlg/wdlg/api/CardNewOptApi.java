@@ -1,19 +1,11 @@
 package com.dlg.wdlg.api;
 
 import com.dlg.wdlg.comm.UserCardStateEnum;
-import com.dlg.wdlg.pojos.CardInfoPojo;
 
 /**
  * 操作API
  */
-public interface CardOptApi {
-
-    /**
-     * 获取下一张需要记忆的卡
-     *
-     * @return 卡
-     */
-    CardInfoPojo getNextCard();
+public interface CardNewOptApi {
 
     /**
      * 操作一张卡
@@ -38,5 +30,17 @@ public interface CardOptApi {
      * @param word 单词
      */
     void addLoginUserWordCard(String word);
+
+    /**
+     * 设置卡为开始记忆状态
+     * @param cardId 卡ID
+     */
+    void setCardMemory(Long cardId);
+
+    /**
+     * 设置随机数量的卡进行记忆
+     * @param count 数量，最多卡片量
+     */
+    void setRandomCardMemory(long count);
 
 }
