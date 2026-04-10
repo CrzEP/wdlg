@@ -1,5 +1,6 @@
 package com.dlg.wdlg.service.impl;
 
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dlg.wdlg.comm.UserCardDelayEnum;
 import com.dlg.wdlg.entity.CardGroupEntity;
@@ -10,11 +11,14 @@ import com.dlg.wdlg.memory.fsrs.FSRSUtil;
 import com.dlg.wdlg.service.CardGroupService;
 import com.dlg.wdlg.service.CardService;
 import com.dlg.wdlg.service.UserCardInfoService;
+import com.dlg.wdlg.util.UserUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,6 +98,21 @@ public class UserCardInfoServiceImpl extends ServiceImpl<UserCardInfoMapper, Use
                 .stream()
                 .map(UserCardInfoEntity::getId)
                 .toList();
+    }
+
+    @Override
+    public List<UserCardInfoEntity> listTodayMemoryCards(Long groupId) {
+        Long userId = UserUtil.getUserIdNotNull();
+        LambdaQueryChainWrapper<UserCardInfoEntity> queryWrapper = this.lambdaQuery()
+                .select(UserCardInfoEntity::getId)
+                .eq(UserCardInfoEntity::getDelay, UserCardDelayEnum.MEMORY.getCode())
+                .eq(UserCardInfoEntity::getBelongGroupId, groupId)
+                .eq(UserCardInfoEntity::getBelongUserId, userId);
+        LocalDate now = LocalDate.now();
+        LocalDateTime startTime = now.atStartOfDay();
+        LocalDateTime endTime = now.atStartOfDay().plusDays(1).plusSeconds(-1);
+        queryWrapper.between(UserCardInfoEntity::getNextMemoryTime,startTime,endTime);
+        return this.list(queryWrapper);
     }
 
 }

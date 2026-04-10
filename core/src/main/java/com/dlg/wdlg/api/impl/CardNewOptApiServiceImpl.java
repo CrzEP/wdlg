@@ -2,14 +2,12 @@ package com.dlg.wdlg.api.impl;
 
 import com.dlg.wdlg.api.CardNewOptApi;
 import com.dlg.wdlg.comm.UserCardDelayEnum;
-import com.dlg.wdlg.comm.UserCardStateEnum;
 import com.dlg.wdlg.compant.CacheCollection;
 import com.dlg.wdlg.entity.CardEntity;
 import com.dlg.wdlg.entity.UserCardInfoEntity;
 import com.dlg.wdlg.exception.BusinessException;
-import com.dlg.wdlg.memory.MemoryAdapter;
-import com.dlg.wdlg.pojos.CardUserAndLogInfo;
-import com.dlg.wdlg.service.*;
+import com.dlg.wdlg.service.CardService;
+import com.dlg.wdlg.service.UserCardInfoService;
 import com.dlg.wdlg.util.RandomUtil;
 import com.dlg.wdlg.util.UserUtil;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -25,41 +23,11 @@ import java.util.*;
 public class CardNewOptApiServiceImpl implements CardNewOptApi {
 
     @Resource
-    CardGroupService cardGroupService;
-    @Resource
     UserCardInfoService userCardInfoService;
-    @Resource
-    CardMemoryLogService cardMemoryLogService;
-    @Resource
-    MemoryAdapter memoryAdapter;
-    @Resource
-    private WordService wordService;
     @Resource
     private CardService cardService;
 
     private final Cache<Long, LinkedHashMap<String, UserCardInfoEntity>> userCardCache = CacheCollection.USER_CARD_CACHE;
-
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public void optCard(Long cardId, UserCardStateEnum statge, Long optTime) {
-        UserCardInfoEntity cardInfoEntity = userCardInfoService.getNotNullByCardId(cardId);
-        // 复习
-        if (optTime == null) {
-            optTime = System.currentTimeMillis();
-        }
-        CardUserAndLogInfo userAndLogInfo = memoryAdapter.review(cardInfoEntity, statge, optTime);
-        updateCardUserAndLogInfo(userAndLogInfo);
-    }
-
-    /**
-     * 更新
-     *
-     * @param userAndLogInfo userAndLogInfo
-     */
-    public void updateCardUserAndLogInfo(CardUserAndLogInfo userAndLogInfo) {
-        userCardInfoService.updateById(userAndLogInfo.getUserCardInfoEntity());
-        cardMemoryLogService.save(userAndLogInfo.getMemoryLogEntity());
-    }
 
     @Override
     public void addLoginUserPubCardGroup(Long pubGroupId) {

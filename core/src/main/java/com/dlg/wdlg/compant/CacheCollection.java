@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,6 +23,15 @@ public class CacheCollection {
             .build();
 
     /**
+     * token-UserMap
+     */
+    public static final Cache<String, Map<String, Object>> TOKEN_USER_MAP = Caffeine.newBuilder()
+            .expireAfterWrite(7, TimeUnit.DAYS) // 写入后7天过期
+            .maximumSize(100) // 最多100条
+            .build();
+
+
+    /**
      * 用户卡片缓存
      */
     public static final Cache<Long, LinkedHashMap<String, UserCardInfoEntity>> USER_CARD_CACHE = Caffeine.newBuilder()
@@ -29,6 +39,18 @@ public class CacheCollection {
             .maximumSize(1000) // 最多1000条
             .build();
 
+    /**
+     * 登出、手动国旗
+     *
+     * @param token token
+     */
+    public static void invalidate(String token) {
+        TOKEN_CACHE.invalidate(token);
+        TOKEN_USER_MAP.invalidate(token);
+    }
 
+    public static final String USER_GROUP_CACHE_NAME = "USER-MAP";
+
+    public static final String USER_MAP_GROUP_KEY = "USER-MAP-GROUP-key";
 
 }

@@ -48,4 +48,9 @@ public interface UserCardInfoService extends IService<UserCardInfoEntity> {
      */
     List<Long> ListDelayUserCard(Integer type);
 
+    /**
+     * 获取当天需要记忆的卡片
+     */
+    List<UserCardInfoEntity> listTodayMemoryCards(Long id);
+
 }

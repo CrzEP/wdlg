@@ -6,13 +6,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dlg.wdlg.comm.AvailableEnum;
 import com.dlg.wdlg.comm.GConst;
 import com.dlg.wdlg.compant.CacheCollection;
+import com.dlg.wdlg.entity.CardGroupEntity;
 import com.dlg.wdlg.entity.UserEntity;
 import com.dlg.wdlg.exception.BusinessException;
 import com.dlg.wdlg.mapper.UserMapper;
+import com.dlg.wdlg.service.CardGroupService;
 import com.dlg.wdlg.service.UserService;
 import com.dlg.wdlg.util.AlgoUtil;
 import com.dlg.wdlg.util.ServletRequestUtil;
 import com.github.benmanes.caffeine.cache.Cache;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -20,11 +23,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements UserService {
+
+    @Resource
+    CardGroupService cardGroupService;
 
     /**
      * 用户缓存
@@ -55,6 +63,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userCache.put(token, userEntity);
         HttpServletRequest request = ServletRequestUtil.getRequestWithNotNull();
         request.setAttribute(GConst.TOKEN, token);
+        // 缓存用户信息
+        Map<String, Object> userMap = new HashMap<>();
+        CardGroupEntity cardGroup = cardGroupService.getUserLearningCardGroup(userEntity.getId());
+        userMap.put(CacheCollection.USER_MAP_GROUP_KEY, cardGroup);
+        CacheCollection.TOKEN_USER_MAP.put(CacheCollection.USER_GROUP_CACHE_NAME, userMap);
     }
 
     @Override
@@ -64,7 +77,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             return;
         }
         String username = userEntity.getName();
-        userCache.invalidate(token);
+        CacheCollection.invalidate(token);
         log.info("user : {} login out", username);
     }
 
